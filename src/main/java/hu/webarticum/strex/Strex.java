@@ -14,6 +14,18 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * <p>Represents a sorted collection of strings generated from the given regular expression.</p>
+ * 
+ * <p>Example of use:</p>
+ * 
+ * <pre>
+ * Strex identifiers = Strex.compile("PID:\d{3}\-[a-f]{5}\-[xrbc]{3}");
+ * System.out.println(identifiers.size());           // 497664000 ( = 10^3 × 1 × 6^5 × 1 × 4^3)
+ * System.out.println(identifiers.get(0));           // PID:000-aaaaa-bbb
+ * System.out.println(identifiers.get(497663999));   // PID:999-fffff-xxx
+ * </pre>
+ */
 public class Strex implements Iterable<String> {
     
     private static final Pattern QUANTIFIED_PART_PATTERN = Pattern.compile(
@@ -295,20 +307,44 @@ public class Strex implements Iterable<String> {
         return result;
     }
 
-    
+
+    /**
+     * Compiles the given regular expression pattern, and returns with a `Strex` object
+     * containing an alphabetically sorted list of all the matching strings.
+     * 
+     * @param pattern the regular expression used as a template
+     * @return the `Strex` object containing the matching strings
+     */
     public static Strex compile(String pattern) {
         return new Strex(pattern);
     }
 
-    
+
+    /**
+     * Gets the size of this string collection as a `BigInteger` instance.
+     * 
+     * @return the size of this collection
+     */
     public BigInteger size() {
         return size;
     }
 
+    /**
+     * Gets the nth generated string, in alphabetical order.
+     * 
+     * @param index index of the output string as a `long` value
+     * @return the nth generated string
+     */
     public String get(long index) {
         return get(BigInteger.valueOf(index));
     }
 
+    /**
+     * Gets the nth generated string, in alphabetical order.
+     * 
+     * @param index index of the output string as a `BigInteger` instance
+     * @return the nth generated string
+     */
     public String get(BigInteger index) {
         if (index.compareTo(BigInteger.ZERO) < 0 || index.compareTo(size) >= 0) {
             throw new ArrayIndexOutOfBoundsException("Index out of range: " + index + "(size: " + size + ")");
@@ -328,6 +364,11 @@ public class Strex implements Iterable<String> {
         return resultBuilder.toString();
     }
 
+    /**
+     * Creates an iterator that iterates through the matching strings in alphabetical order.
+     * 
+     * @return the string iterator
+     */
     @Override
     public Iterator<String> iterator() {
         return new StrexIterator();
