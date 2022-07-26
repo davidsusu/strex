@@ -46,18 +46,39 @@ class StrexTest {
     }
 
     @Test
-    void testComplex() {
+    void testOddDashes() {
+        Strex strex = Strex.compile("[-xa][tr-]-");
+        check(strex, new String[] { "---", "-r-", "-t-", "a--", "ar-", "at-", "x--", "xr-", "xt-" });
+    }
+
+    @Test
+    void testComplex1() {
         Strex strex = Strex.compile("^^^[v-ya3]\\.\\^\\d\\W{2}\\$$");
         check(strex, new String[] { "3.^0  $" }, BigInteger.valueOf(61440));
     }
 
     @Test
-    void testLarge() {
+    void testComplex2() {
+        Strex strex = Strex.compile("^^[a-c\\d-]\\w\\\\\\$$$");
+        check(strex, new String[] { "-_\\$" }, BigInteger.valueOf(882));
+    }
+
+    @Test
+    void testLarge1() {
         Strex strex = Strex.compile("\\d{70}");
         check(
                 strex,
                 new String[] { "0000000000000000000000000000000000000000000000000000000000000000000000" },
                 new BigInteger("10000000000000000000000000000000000000000000000000000000000000000000000"));
+    }
+
+    @Test
+    void testLarge2() {
+        Strex strex = Strex.compile("\\w{20}\\d");
+        check(
+                strex,
+                new String[] { "____________________0" },
+                new BigInteger("9700876798663497167909692193801408010"));
     }
     
     
