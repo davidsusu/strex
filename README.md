@@ -2,8 +2,8 @@
 
 **Generate sorted string list from a regular expression.**
 
-`Strex` is a java library for generating a alphabetically sorted list of all strings
-that matches to a given regular expression.
+`Strex` is a java library for generating a alphabetically sorted lazy list of
+all the strings that matches to a given regular expression.
 
 Example:
 
@@ -20,20 +20,23 @@ Currently a very limited subset of regular expression features is supported.
 These are:
 
 - simple literals (e. g. `a`)
-- escape literals (e. g. `\t`, `\.`)
+- escaped literals (e. g. `\t`, `\.`)
+- positive character classes (e. g. `[a-f\d]`)
 - dot (`.`), generates a printable ASCII character
 - fixed quantifier (e. g. `{3}`)
 - optional `^` at start and `$` at end
+- non-ascii characters (e. g. `ű{3}[a-záé]`)
 
 ## Planned features
 
 In the near future it's planned to implement some more advanced constructs:
 
+- negative character classes (e. g. `[^\da-fA-F]`)
 - variable-length quantifiers (e. g. `?`, `*`, `+`, `{2,5}` etc.)
 - groups (e. g. `(lorem)`, `(?<name>ipsum)`)
 - alternation (e. g. `abc|xyz`)
 - unicode codepoints
-- and more
+- and more...
 
 ## What is this good for?
 
