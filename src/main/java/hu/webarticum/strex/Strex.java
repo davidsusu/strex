@@ -3,6 +3,7 @@ package hu.webarticum.strex;
 import java.math.BigInteger;
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -36,7 +37,7 @@ public class Strex implements Iterable<String> {
     private static final Pattern END_PATTERN = Pattern.compile("(\\\\*)\\$\\$*$");
     
     private static final Pattern ATOM_PATTERN = Pattern.compile(
-            "([^\\\\\\[])|\\\\(.)|\\[((?:[^\\\\\\]]|\\\\.)+)\\]"); // NOSONAR: this pattern is safe enough
+            "([^\\\\\\[])|\\\\(.)|\\[(\\^)?((?:[^\\\\\\]]|\\\\.)+)\\]"); // NOSONAR: this pattern is safe enough
     
     private static final Pattern SET_ITEM_PATTERN = Pattern.compile(
             "([^\\\\])|\\\\(.)");
@@ -120,9 +121,10 @@ public class Strex implements Iterable<String> {
         while (matcher.find()) {
             String nonEscapedContent = matcher.group(1);
             String escapedContent = matcher.group(2);
-            String setContent = matcher.group(3);
+            String setContent = matcher.group(4);
             if (setContent != null) {
-                result.add(parseSet(setContent));
+                boolean negated = matcher.group(3) != null;
+                result.add(parseSet(setContent, negated));
             } else {
                 boolean escaped = escapedContent != null;
                 String content = escaped ? escapedContent : nonEscapedContent;
@@ -132,7 +134,7 @@ public class Strex implements Iterable<String> {
         return result;
     }
     
-    private static char[] parseSet(String setContent) {
+    private static char[] parseSet(String setContent, boolean negated) {
         int length = setContent.length();
         Matcher matcher = SET_ITEM_PATTERN.matcher(setContent);
         List<char[]> unionMembers = new ArrayList<>();
@@ -180,7 +182,10 @@ public class Strex implements Iterable<String> {
         if (previousItem != null) {
             unionMembers.add(previousItem);
         }
-        return createSortedUnion(unionMembers);
+        
+        char[] positiveContent = createSortedUnion(unionMembers);
+        
+        return negated ? negate(positiveContent) : positiveContent;
     }
 
     private static char[] parseItem(char c, boolean escaped) {
@@ -290,9 +295,31 @@ public class Strex implements Iterable<String> {
                 characters.add(c);
             }
         }
-        int size = characters.size();
+        return toArray(characters);
+    }
+    
+    private static char[] negate(char[] positiveContent) {
+        char[] dotChars = parseNonEscaped('.');
+        List<Character> resultBuilder = new ArrayList<>(dotChars.length - positiveContent.length);
+        for (char dotChar : dotChars) {
+            boolean found = false;
+            for (char c : positiveContent) {
+                if (c == dotChar) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                resultBuilder.add(dotChar);
+            }
+        }
+        return toArray(resultBuilder);
+    }
+    
+    private static char[] toArray(Collection<Character> characterCollection) {
+        int size = characterCollection.size();
         char[] result = new char[size];
-        Iterator<Character> characterIterator = characters.iterator();
+        Iterator<Character> characterIterator = characterCollection.iterator();
         for (int i = 0; characterIterator.hasNext(); i++) {
             result[i] = characterIterator.next();
         }

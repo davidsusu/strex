@@ -34,6 +34,18 @@ class StrexTest {
     }
 
     @Test
+    void testCharClazzWithNonAscii() {
+        Strex strex = Strex.compile("[ű2-4á]");
+        check(strex, new String[] { "2", "3", "4", "á", "ű" });
+    }
+
+    @Test
+    void testNegatedCharClazz() {
+        Strex strex = Strex.compile("[^a-zéű]");
+        check(strex, new String[] { " " }, BigInteger.valueOf(69));
+    }
+
+    @Test
     void testQuantifiers() {
         Strex strex = Strex.compile("a{3}b{2}");
         check(strex, new String[] { "aaabb" });
@@ -61,6 +73,12 @@ class StrexTest {
     void testComplex2() {
         Strex strex = Strex.compile("^^[a-c\\d-]\\w\\\\\\$$$");
         check(strex, new String[] { "-_\\$" }, BigInteger.valueOf(882));
+    }
+
+    @Test
+    void testComplex3() {
+        Strex strex = Strex.compile("[^\\Wd-zB-Z0-9]ő{2}");
+        check(strex, new String[] { "_őő", "aőő", "Aőő", "bőő", "cőő" });
     }
 
     @Test

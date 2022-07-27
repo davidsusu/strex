@@ -20,7 +20,8 @@ Currently, a very limited subset of regular expression features is supported:
 
 - simple literals (e. g. `a`)
 - escaped literals (e. g. `\t`, `\.`)
-- positive character classes (e. g. `[a-f\d]`)
+- normal character classes (e. g. `[a-f\d]`)
+- negated character classes (e. g. `[^\da-fA-F]`)
 - predefined character classes (`\s`, `\S`, `\w`, `\W`, `\d`, `\D`)
 - dot (`.`), generates a printable ASCII character
 - fixed quantifier (e. g. `{3}`)
@@ -31,7 +32,6 @@ Currently, a very limited subset of regular expression features is supported:
 
 In the future it's planned to implement some more advanced constructs:
 
-- negative character classes (e. g. `[^\da-fA-F]`)
 - variable-length quantifiers (e. g. `?`, `*`, `+`, `{2,5}` etc.)
 - groups (e. g. `(lorem)`, `(?<name>ipsum)`)
 - alternation (e. g. `abc|xyz`)
