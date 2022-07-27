@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  * 
  * <pre>
  * Strex identifiers = Strex.compile("PID:\\d{3}\\-[a-f]{5}\\-[xrbc]{3}");
- * System.out.println(identifiers.size());                       // 497664000 ( = 10^3 × 1 × 6^5 × 1 × 4^3)
+ * System.out.println(identifiers.size());                       // 497664000 ( = 10^3 × 1 × 6^5 × 1 × 4^3 )
  * System.out.println(identifiers.get(0));                       // PID:000-aaaaa-bbb
  * System.out.println(identifiers.get(497663999));               // PID:999-fffff-xxx
  * System.out.println(identifiers.indexOf("PID:354-fedab-xbb")); // 176650096
