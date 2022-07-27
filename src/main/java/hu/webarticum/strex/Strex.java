@@ -3,6 +3,7 @@ package hu.webarticum.strex;
 import java.math.BigInteger;
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -21,10 +22,11 @@ import java.util.regex.Pattern;
  * <p>Example of use:</p>
  * 
  * <pre>
- * Strex identifiers = Strex.compile("PID:\d{3}\-[a-f]{5}\-[xrbc]{3}");
- * System.out.println(identifiers.size());           // 497664000 ( = 10^3 × 1 × 6^5 × 1 × 4^3)
- * System.out.println(identifiers.get(0));           // PID:000-aaaaa-bbb
- * System.out.println(identifiers.get(497663999));   // PID:999-fffff-xxx
+ * Strex identifiers = Strex.compile("PID:\\d{3}\\-[a-f]{5}\\-[xrbc]{3}");
+ * System.out.println(identifiers.size());                       // 497664000 ( = 10^3 × 1 × 6^5 × 1 × 4^3)
+ * System.out.println(identifiers.get(0));                       // PID:000-aaaaa-bbb
+ * System.out.println(identifiers.get(497663999));               // PID:999-fffff-xxx
+ * System.out.println(identifiers.indexOf("PID:354-fedab-xbb")); // 176650096
  * </pre>
  */
 public class Strex implements Iterable<String> {
@@ -389,6 +391,62 @@ public class Strex implements Iterable<String> {
             resultBuilder.append(c);
         }
         return resultBuilder.toString();
+    }
+
+    /**
+     * Finds the given text in the output space, and provides its index,
+     * or, if not found, the (-1)-based insertion point (like {@link Arrays#binarySearch(Object[], Object)}.
+     * 
+     * @param text the potential output to find
+     * @return alphabetical index of the text or a negative number
+     */
+    public BigInteger indexOf(String text) {
+        int patternLength = parts.size();
+        int textLength = text.length();
+        int length = textLength < patternLength ? textLength : patternLength;
+        
+        BigInteger floor = BigInteger.ZERO;
+        BigInteger space = size;
+        for (int i = 0; i < length; i++) {
+            char[] part = parts.get(i);
+            int chunkCount = part.length;
+            BigInteger chunkSize = space.divide(BigInteger.valueOf(chunkCount));
+            char c = text.charAt(i);
+            
+            int posResult = findCharInPart(part, c);
+            boolean found = posResult >= 0;
+            int pos = posResult >= 0 ? posResult : 0 - posResult - 1;
+
+            floor = floor.add(chunkSize.multiply(BigInteger.valueOf(pos)));
+            space = chunkSize;
+            
+            if (!found) {
+                return floor.negate().subtract(BigInteger.ONE);
+            } else if (i == length - 1) {
+                if (textLength == patternLength) {
+                    return floor;
+                } else if (textLength < patternLength) {
+                    return floor.negate().subtract(BigInteger.ONE);
+                } else {
+                    return floor.negate().subtract(BigInteger.TWO);
+                }
+            }
+        }
+        
+        return size.negate().subtract(BigInteger.ONE);
+    }
+    
+    private int findCharInPart(char[] part, char c) {
+        String cAsString = Character.toString(c);
+        for (int i = 0; i < part.length; i++) {
+            char partC = part[i];
+            if (partC == c) {
+                return i;
+            } else if (collator.compare(Character.toString(partC), cAsString) > 0) {
+                return 0 - i - 1;
+            }
+        }
+        return 0 - part.length - 1;
     }
 
     /**

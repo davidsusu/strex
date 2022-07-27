@@ -98,6 +98,42 @@ class StrexTest {
                 new String[] { "____________________0" },
                 new BigInteger("9700876798663497167909692193801408010"));
     }
+
+    @Test
+    void testIndexOfContained() {
+        Strex strex = Strex.compile("[mu]\\d");
+        assertThat(strex.indexOf("u3")).isEqualTo(13);
+    }
+
+    @Test
+    void testIndexOfNotContainedBefore() {
+        Strex strex = Strex.compile("[mu]\\d");
+        assertThat(strex.indexOf("a0")).isEqualTo(-1);
+    }
+
+    @Test
+    void testIndexOfNotContainedInner() {
+        Strex strex = Strex.compile("[mu]\\d");
+        assertThat(strex.indexOf("p2")).isEqualTo(-11);
+    }
+
+    @Test
+    void testIndexOfNotContainedAfter() {
+        Strex strex = Strex.compile("[mu]\\d");
+        assertThat(strex.indexOf("z5")).isEqualTo(-21);
+    }
+
+    @Test
+    void testIndexOfShorter() {
+        Strex strex = Strex.compile("[mu]\\d");
+        assertThat(strex.indexOf("u")).isEqualTo(-11);
+    }
+
+    @Test
+    void testIndexOfLonger() {
+        Strex strex = Strex.compile("[mu]\\d");
+        assertThat(strex.indexOf("m4u")).isEqualTo(-6);
+    }
     
     
     void check(Strex strex, String[] outputs) {
