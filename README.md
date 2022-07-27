@@ -5,7 +5,31 @@
 `Strex` is a java library for generating an alphabetically sorted lazy list of
 all the strings that match a given fixed-length regular expression.
 
-Example:
+## Add to projects
+
+Gradle projects:
+
+```groovy
+
+dependencies {
+    implementation "hu.webarticum.strex:strex:${strexVersion}"
+}
+
+```
+
+Maven projects:
+
+```xml
+<dependency>
+  <groupId>hu.webarticum.strex</groupId>
+  <artifactId>strex</artifactId>
+  <version>${strexVersion}</version>
+</dependency>
+```
+
+## Example
+
+Here is a little demonstration of the key features:
 
 ```java
 Strex identifiers = Strex.compile("PID:\\d{3}\\-[a-f]{5}\\-[xrbc]{3}");
