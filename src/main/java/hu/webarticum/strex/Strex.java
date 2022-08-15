@@ -12,6 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,7 +62,7 @@ public class Strex implements Iterable<String> {
 
     private static String preprocess(String pattern) {
         Matcher matcher = QUANTIFIED_PART_PATTERN.matcher(pattern);
-        String unfolded = matcher.replaceAll(Strex::unfoldQuantifiers);
+        String unfolded = replaceAll(matcher, Strex::unfoldQuantifiers);
         return removeBoundariesFromStartAndEnd(unfolded);
     }
     
@@ -98,7 +99,18 @@ public class Strex implements Iterable<String> {
 
     private static String removeBoundariesFromStartAndEnd(String pattern) {
         String startRemoved = START_PATTERN.matcher(pattern).replaceFirst("");
-        return END_PATTERN.matcher(startRemoved).replaceAll(Strex::replaceEndPattern);
+        return replaceAll(END_PATTERN.matcher(startRemoved), Strex::replaceEndPattern);
+    }
+    
+    // emulates java9's Matcher::replaceAll
+    private static String replaceAll(Matcher matcher, Function<MatchResult, String> replacer) {
+        StringBuffer resultBuilder = new StringBuffer();
+        while (matcher.find()) {
+            String replacement = replacer.apply(matcher.toMatchResult());
+            matcher.appendReplacement(resultBuilder, replacement);
+        }
+        matcher.appendTail(resultBuilder);
+        return resultBuilder.toString();
     }
 
     private static String replaceEndPattern(MatchResult matchResult) {
@@ -428,7 +440,7 @@ public class Strex implements Iterable<String> {
                 } else if (textLength < patternLength) {
                     return floor.negate().subtract(BigInteger.ONE);
                 } else {
-                    return floor.negate().subtract(BigInteger.TWO);
+                    return floor.negate().subtract(BigInteger.valueOf(2L));
                 }
             }
         }
